@@ -25,7 +25,7 @@ class Compile:
             main_image = self.auto_parser.main_image(),
             image_count = self.auto_parser.image_count(),
             state_number = self.auto_parser.state_number(),
-            vin_number = "TODO",
+            vin_number = None,
             now = datetime.datetime.utcnow()
         )
 
