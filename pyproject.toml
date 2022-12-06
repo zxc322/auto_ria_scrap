@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "auto-ria-scrap"
+version = "0.1.0"
+description = ""
+authors = ["zxc_322 <kvasoliaeww@gmail.com>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.9"
+httpx = "^0.23.1"
+parsel = "^1.7.0"
+psycopg2-binary = "^2.9.5"
+python-dotenv = "^0.21.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
