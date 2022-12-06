@@ -11,9 +11,6 @@ from src.database.insert import Insert
 
 class Fetcher:
 
-    # def __init__(self) -> None:
-    #     self.client = httpx.Client()
-
     def run_scrap(self, url: str):
         with httpx.Client() as client:
             response = client.get(url)
