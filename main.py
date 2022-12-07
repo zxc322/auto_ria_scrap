@@ -1,27 +1,16 @@
-from src.scraper.start_fetching import Fetcher
-from src.constants.web import URL as url
-from src.database.connection import MyDatabase
+import asyncio
 
-import time
-import sys
-
-if not MyDatabase().table_exists():
-    MyDatabase().create_table()
-
-if len(sys.argv)>1:
-    url = sys.argv[1]
-
-fetcher = Fetcher()
-page_counter = 1
-
-if __name__ == '__main__':
-    start = time.time()
-    while url:
-        print(f'--- page-{page_counter}, url: {url}, current_time: {time.time()-start} ---', end='\n')
-        url = fetcher.run_scrap(url)
-        page_counter += 1
+from src.fetcher import Fetcher
+from src.database import Database
 
 
 
+
+if not Database().table_exists():
+    Database().create_table()
+
+
+# start_url="https://auto.ria.com/uk/car/used/?page=12"
+asyncio.get_event_loop().run_until_complete(Fetcher().run())
 
 
