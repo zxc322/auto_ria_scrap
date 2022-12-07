@@ -13,7 +13,7 @@ class Fetcher:
 
 
     async def run(self):
-        browser = await pyppeteer.launch({"headless": False})
+        browser = await pyppeteer.launch({"headless": True})
         page = await browser.newPage()
         await page.goto(self.start_url)
         await self.accept_cookies(page=page)
@@ -31,21 +31,22 @@ class Fetcher:
         data_set = list()
         for i in range(urls_counter):          
             await asyncio.sleep(1)
-            urls = await page.querySelectorAll('div.item.ticket-title > a')      
-            print(f'[INFO] page progress: {i+1}/{urls_counter}')
+            urls = await page.querySelectorAll('div.item.ticket-title > a')
+            if urls:      
+                print(f'[INFO] page progress: {i+1}/{urls_counter}')
 
-            await asyncio.gather(
-                page.waitForNavigation(),
-                urls[i].click(selector='a'),
-            )
-            
-            try:
-                data = await self.scrap_auto_page(page=page)
-                data_set.append(data)
-            except pyppeteer.errors.PageError as ex:
-                print(f'[ERROR] {ex}\nSkipping...')
-      
-            await page.goBack()
+                await asyncio.gather(
+                    page.waitForNavigation(),
+                    urls[i].click(selector='a'),
+                )
+                
+                try:
+                    data = await self.scrap_auto_page(page=page)
+                    data_set.append(data)
+                except pyppeteer.errors.PageError as ex:
+                    print(f'[ERROR] {ex}\nSkipping...')
+        
+                await page.goBack()
         
         Database().insert_auto(data_set=data_set)
         return await self.next_page(page)

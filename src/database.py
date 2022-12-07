@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 POSTGRES_DB = os.environ.get('POSTGRES_DB')
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DOCKER_DATABASE_URL = os.environ.get('DOCKER_DATABASE_URL')
 LOCAL_DATABASE_URL = os.environ.get('LOCAL_DATABASE_URL')
 
 class Database:
     
     def __init__(self) -> None:
         self.table_name = POSTGRES_DB
-        self.conn = psycopg2.connect(LOCAL_DATABASE_URL)
+        self.conn = psycopg2.connect(DOCKER_DATABASE_URL)
         self.cursor = self.conn.cursor()
         
 
