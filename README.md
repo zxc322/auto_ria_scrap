@@ -6,8 +6,10 @@
 
 ### Done. Script will be runing while `next_page` button is on page
 
-By default its start from page #1, but you can change start url. In docker-compose.yml:
+You can change start url and docker mode (default=True) in main.py:
     
-    python main.py <start_url>
+    ```
+    asyncio.get_event_loop().run_until_complete(Fetcher(start_url=start_url, docker_mode=docker_mode).run())
+    ```
 
 ###### Check data on `localhost:5050`

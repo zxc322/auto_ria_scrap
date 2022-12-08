@@ -14,7 +14,7 @@ start_url="https://auto.ria.com/uk/car/used/?page=12"
 
 if __name__ == "__main__":
     try:
-        asyncio.get_event_loop().run_until_complete(Fetcher(start_url=start_url, docker_mode=docker_mode).run())
+        asyncio.get_event_loop().run_until_complete(Fetcher(docker_mode=docker_mode).run())
     except KeyboardInterrupt:
         print('Interrupted')
         try:
