@@ -20,15 +20,17 @@ class Fetcher:
         args = list()
 
         if self.docker_mode:
-            args=[
-            '--no-sandbox',
-            '--single-process',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-zygote'
-        ]
-
-        browser = await pyppeteer.launch(executablePath="/usr/bin/google-chrome-stable", headless=True, args=args)
+            args= [
+                '--no-sandbox',
+                '--single-process',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--no-zygote'
+            ]
+            browser = await pyppeteer.launch(executablePath="/usr/bin/google-chrome-stable", args=args)
+        else:
+            browser = await pyppeteer.launch(headless=False)
+       
         page = await browser.newPage()
         await page.goto(self.start_url)
         await self.accept_cookies(page=page)
