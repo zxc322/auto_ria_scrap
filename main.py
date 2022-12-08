@@ -1,16 +1,23 @@
 import asyncio
+import sys, os
 
 from src.fetcher import Fetcher
 from src.database import Database
 
 
+docker_mode=True
 
+if not Database(docker_mode=docker_mode).table_exists():
+    Database(docker_mode=docker_mode).create_table()
 
-if not Database().table_exists():
-    Database().create_table()
+start_url="https://auto.ria.com/uk/car/used/?page=12"
 
-
-# start_url="https://auto.ria.com/uk/car/used/?page=12"
-asyncio.get_event_loop().run_until_complete(Fetcher().run())
-
-
+if __name__ == "__main__":
+    try:
+        asyncio.get_event_loop().run_until_complete(Fetcher(start_url=start_url, docker_mode=docker_mode).run())
+    except KeyboardInterrupt:
+        print('Interrupted')
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

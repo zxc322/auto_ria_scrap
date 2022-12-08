@@ -7,13 +7,28 @@ from src.database import Database
 
 class Fetcher:
 
-    def __init__(self, start_url: str = "https://auto.ria.com/uk/car/used/") -> None:
+    def __init__(self, start_url: str = "https://auto.ria.com/uk/car/used/", docker_mode: bool = False) -> None:
         self.start_url = start_url
+        self.docker_mode = docker_mode
         self.scraper = Scraper()
 
 
+    async def error_msg(self, er) -> None:
+        print(f'[ERROR] {er}\nSkipping...')
+
     async def run(self):
-        browser = await pyppeteer.launch({"headless": True})
+        args = list()
+
+        if self.docker_mode:
+            args=[
+            '--no-sandbox',
+            '--single-process',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-zygote'
+        ]
+
+        browser = await pyppeteer.launch(executablePath="/usr/bin/google-chrome-stable", headless=True, args=args)
         page = await browser.newPage()
         await page.goto(self.start_url)
         await self.accept_cookies(page=page)
@@ -29,26 +44,28 @@ class Fetcher:
         urls_list = await page.querySelectorAll('div.item.ticket-title > a.address')
         urls_counter = len(urls_list)
         data_set = list()
-        for i in range(urls_counter):          
-            await asyncio.sleep(1)
-            urls = await page.querySelectorAll('div.item.ticket-title > a')
-            if urls:      
-                print(f'[INFO] page progress: {i+1}/{urls_counter}')
-
-                await asyncio.gather(
-                    page.waitForNavigation(),
-                    urls[i].click(selector='a'),
-                )
-                
-                try:
-                    data = await self.scrap_auto_page(page=page)
-                    data_set.append(data)
-                except pyppeteer.errors.PageError as ex:
-                    print(f'[ERROR] {ex}\nSkipping...')
+        for i in range(urls_counter):     
+            try:      
+                await asyncio.sleep(1)
+                urls = await page.querySelectorAll('div.item.ticket-title > a')
+                try:      
+                    print(f'[INFO] page progress: {i+1}/{urls_counter}')
+                    await asyncio.gather(
+                        page.waitForNavigation(),
+                        urls[i].click(selector='a'),
+                    )            
+                    try:
+                        data = await self.scrap_auto_page(page=page)
+                        data_set.append(data)
+                    except pyppeteer.errors.PageError as ex:
+                        await self.error_msg(ex)
+                    await page.goBack()
+                except IndexError as ex:
+                    await self.error_msg(ex)
+            except pyppeteer.errors.TimeoutError as ex:
+                await self.error_msg(ex)
         
-                await page.goBack()
-        
-        Database().insert_auto(data_set=data_set)
+        Database(docker_mode=self.docker_mode).insert_auto(data_set=data_set)
         return await self.next_page(page)
 
     

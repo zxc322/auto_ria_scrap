@@ -46,13 +46,14 @@ class Scraper:
 
     def seller_phones(self) -> List:
         phones = list()
-        phones_div = self.selector.xpath('//div[contains(@class, "phones_list")]')
+        phones_div = self.selector.xpath('//div[contains(@class, "phones_list") and contains(@class, "mb-15")]')
         if phones_div:
-            for el in phones_div:
-                phone = el.xpath('div/span[contains(@class, "phone")]/text()').get()
+            for el in phones_div[0].xpath('div'):
+                phone = el.xpath('span[contains(@class, "phone")]/text()').get()
                 if phone:
+                    phone = '+38' + phone.replace('(', '').replace(')', '').replace(' ', '')
                     print('phone:', phone)
-                    phones.append('+38' + phone.replace('(', '').replace(')', '').replace(' ', ''))
+                    phones.append(phone)
         return phones
 
 
@@ -62,7 +63,9 @@ class Scraper:
             image = json.loads(script.strip().split('=')[-1])
             return image
         else:
-            images = self.selector.xpath('//div[@class="image-gallery-slide center"]/div[contains(@class, "image-gallery-image")]/picture/source').attrib['srcset']
+            images = self.selector.xpath(
+                    '//div[@class="image-gallery-slide center"]/div[contains(@class, "image-gallery-image")]/picture/source'
+                ).attrib['srcset']
             return images.split(',')[-1].strip() if images else None
 
 

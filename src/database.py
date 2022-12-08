@@ -11,9 +11,10 @@ LOCAL_DATABASE_URL = os.environ.get('LOCAL_DATABASE_URL')
 
 class Database:
     
-    def __init__(self) -> None:
+    def __init__(self, docker_mode: bool = False) -> None:
         self.table_name = POSTGRES_DB
-        self.conn = psycopg2.connect(DOCKER_DATABASE_URL)
+        db_url = LOCAL_DATABASE_URL if not docker_mode else DOCKER_DATABASE_URL
+        self.conn = psycopg2.connect(db_url)
         self.cursor = self.conn.cursor()
         
 
